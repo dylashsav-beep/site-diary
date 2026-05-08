@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Site Diary</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-for-js/2.38.3/msal-browser.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
   :root {
@@ -17,362 +16,359 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
-  /* SETUP SCREEN */
+  /* ── SETUP SCREEN ── */
   .setup-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-  .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;max-width:600px;width:100%}
-  .setup-card h2{font-size:20px;font-weight:500;margin-bottom:8px}
-  .setup-card .subtitle{color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6}
-  .setup-steps{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:20px}
-  .setup-steps h3{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2);margin-bottom:12px}
-  .setup-step{display:flex;gap:12px;margin-bottom:10px;font-size:13px;line-height:1.5}
-  .step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-  .setup-step code{background:var(--border);border-radius:3px;padding:1px 5px;font-family:var(--mono);font-size:11px;color:var(--text)}
+  .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;max-width:540px;width:100%}
+  .setup-card h2{font-size:20px;font-weight:500;margin-bottom:6px}
+  .setup-card .sub{color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6}
   .field-group{margin-bottom:14px}
   .field-group label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px}
   .field-group input{width:100%;border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface)}
   .field-group input:focus{outline:none;border-color:var(--border-strong)}
-  .field-group .hint{font-size:11px;color:var(--text3);margin-top:3px}
+  .field-group .hint{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
+  .setup-steps{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:20px}
+  .setup-steps h3{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
+  .setup-step{display:flex;gap:10px;margin-bottom:8px;font-size:12px;line-height:1.6;color:var(--text2)}
+  .sn{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  code{background:#e8e4de;border-radius:3px;padding:1px 5px;font-family:var(--mono);font-size:11px;color:var(--text)}
+  .err{color:#c0392b;font-size:12px;margin-top:6px;display:none;padding:8px 10px;background:#fde8e8;border-radius:4px}
 
-  /* LOADING */
+  /* ── LOADING ── */
   .loading-screen{display:none;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px}
   .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .loading-text{font-size:13px;color:var(--text3)}
 
-  /* APP */
+  /* ── APP ── */
   .app-screen{display:none}
 
   /* HEADER */
-  .header{background:var(--text);color:#fff;height:56px;display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:100}
-  .header-logo{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#fff;white-space:nowrap}
-  .header-logo span{color:var(--accent)}
-  .header-sep{width:1px;height:24px;background:rgba(255,255,255,0.15)}
-  .job-select{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:var(--font);font-size:12px;padding:5px 8px;border-radius:4px;cursor:pointer;min-width:180px}
-  .job-select option{background:#2a2824;color:#fff}
-  .spacer{flex:1}
-  .btn{font-family:var(--font);font-size:12px;font-weight:500;padding:5px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.15s;letter-spacing:0.02em}
+  .header{background:var(--text);color:#fff;height:52px;display:flex;align-items:center;padding:0 16px;gap:10px;position:sticky;top:0;z-index:100}
+  .logo{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#fff;white-space:nowrap}
+  .logo span{color:var(--accent)}
+  .hsep{width:1px;height:22px;background:rgba(255,255,255,0.15)}
+  .job-sel{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:var(--font);font-size:12px;padding:4px 8px;border-radius:4px;cursor:pointer;min-width:180px}
+  .job-sel option{background:#2a2824}
+  .sp{flex:1}
+  .btn{font-family:var(--font);font-size:12px;font-weight:500;padding:5px 10px;border-radius:4px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.15s}
   .btn-ghost{background:transparent;border-color:rgba(255,255,255,0.2);color:#fff}
-  .btn-ghost:hover{background:rgba(255,255,255,0.08)}
-  .btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-ghost:hover{background:rgba(255,255,255,0.1)}
+  .btn-accent{background:var(--accent);color:#fff}
   .btn-accent:hover{background:#a8401a}
   .btn-outline{background:transparent;border-color:var(--border-strong);color:var(--text2)}
   .btn-outline:hover{background:var(--surface2)}
-  .btn-danger{background:#c0392b;border-color:#c0392b;color:#fff}
+  .btn-danger{background:#c0392b;color:#fff}
   .btn-danger:hover{background:#a93226}
   .btn-sm{padding:4px 8px;font-size:11px}
-  .user-badge{font-size:11px;color:rgba(255,255,255,0.6);font-family:var(--mono)}
-
-  /* SAVE INDICATOR */
-  .save-indicator{font-size:11px;padding:3px 8px;border-radius:10px;font-family:var(--mono);transition:all 0.3s}
-  .save-ok{background:rgba(42,107,60,0.3);color:#7ecfa0}
-  .save-saving{background:rgba(200,80,26,0.3);color:#f5a880}
-  .save-error{background:rgba(192,57,43,0.3);color:#f5a880}
+  .user-badge{font-size:11px;color:rgba(255,255,255,0.5);font-family:var(--mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .save-ind{font-size:11px;padding:3px 8px;border-radius:10px;font-family:var(--mono)}
+  .si-ok{background:rgba(42,107,60,0.3);color:#7ecfa0}
+  .si-saving{background:rgba(200,80,26,0.3);color:#f5a880}
+  .si-err{background:rgba(192,57,43,0.3);color:#f5a880}
 
   /* DAY NAV */
-  .day-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px}
+  .day-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .nav-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-  .nav-btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
-  .day-label{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;color:var(--text);min-width:110px;text-align:center}
-  .day-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
-  .weather-select{font-family:var(--font);font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);cursor:pointer}
+  .nav-btn:hover{background:var(--text);color:#fff}
+  .day-label{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);min-width:140px;text-align:center}
+  .weather-sel{font-family:var(--font);font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);cursor:pointer}
 
   /* TABS */
   .tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex}
-  .tab{font-size:12px;font-weight:500;padding:9px 14px;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap;letter-spacing:0.03em}
+  .tab{font-size:12px;font-weight:500;padding:9px 14px;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap}
   .tab:hover{color:var(--text)}
   .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 
   /* MAIN */
-  .main{padding:16px;max-width:100%}
-  .tab-panel{display:none}
-  .tab-panel.active{display:block}
+  .main{padding:16px}
+  .tp{display:none}
+  .tp.active{display:block}
 
   /* MATRIX */
-  .matrix-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .matrix-title{font-size:12px;font-weight:500;color:var(--text2)}
-  .text-muted{color:var(--text3);font-size:11px}
-  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--surface)}
-  table.matrix{border-collapse:collapse;min-width:100%;font-size:12px}
-  table.matrix th,table.matrix td{border:1px solid var(--border);padding:0}
-  table.matrix th{background:var(--text);color:#fff;font-size:10px;font-weight:500;text-align:center;letter-spacing:0.03em;white-space:nowrap;padding:5px 7px}
-  table.matrix th.th-labour{background:var(--accent2)}
-  table.matrix th.th-plant{background:var(--amber)}
-  table.matrix th.th-sub{background:var(--green)}
-  table.matrix th.th-wbs{background:#4a4540}
-  table.matrix th.th-total{background:var(--accent)}
-  table.matrix th.th-activity{background:var(--text);text-align:left}
-  table.matrix td.td-activity{min-width:190px;max-width:260px;background:var(--surface)}
-  table.matrix td.td-activity input{width:100%;border:none;outline:none;font-family:var(--font);font-size:12px;color:var(--text);padding:6px 9px;background:transparent}
-  table.matrix td.td-activity input::placeholder{color:var(--text3)}
-  table.matrix td.td-hours{width:66px;text-align:center;background:var(--surface)}
-  table.matrix td.td-hours input{width:100%;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text);padding:6px 5px;text-align:center;background:transparent}
-  table.matrix td.td-hours.labour input:focus{background:var(--accent2-light)}
-  table.matrix td.td-hours.plant input:focus{background:var(--amber-light)}
-  table.matrix td.td-hours.sub input:focus{background:var(--green-light)}
-  table.matrix td.td-wbs{width:90px;background:var(--surface2)}
-  table.matrix td.td-wbs input{width:100%;border:none;outline:none;font-family:var(--mono);font-size:11px;color:var(--text2);padding:6px 7px;background:transparent}
-  table.matrix td.td-total{width:64px;text-align:center;background:var(--accent-light);font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);padding:6px 7px}
-  .totals-row td{background:var(--surface2)!important;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);padding:7px;text-align:center;border-top:2px solid var(--border-strong)!important}
-  .totals-row td:first-child{text-align:left;color:var(--text2);font-size:10px;letter-spacing:0.05em}
+  .mhdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .mtitle{font-size:12px;font-weight:500;color:var(--text2)}
+  .muted{color:var(--text3);font-size:11px}
+  .twrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--surface)}
+  table.mx{border-collapse:collapse;min-width:100%;font-size:12px}
+  table.mx th,table.mx td{border:1px solid var(--border);padding:0}
+  table.mx th{background:var(--text);color:#fff;font-size:10px;font-weight:500;text-align:center;white-space:nowrap;padding:5px 7px}
+  table.mx th.thl{background:var(--accent2)}
+  table.mx th.thp{background:var(--amber)}
+  table.mx th.ths{background:var(--green)}
+  table.mx th.thw{background:#4a4540}
+  table.mx th.tht{background:var(--accent)}
+  table.mx th.tha{background:var(--text);text-align:left}
+  table.mx td.tda{min-width:190px;max-width:260px;background:var(--surface)}
+  table.mx td.tda input{width:100%;border:none;outline:none;font-family:var(--font);font-size:12px;color:var(--text);padding:6px 9px;background:transparent}
+  table.mx td.tda input::placeholder{color:var(--text3)}
+  table.mx td.tdh{width:66px;text-align:center;background:var(--surface)}
+  table.mx td.tdh input{width:100%;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text);padding:6px 4px;text-align:center;background:transparent}
+  table.mx td.tdh.labour input:focus{background:var(--accent2-light)}
+  table.mx td.tdh.plant input:focus{background:var(--amber-light)}
+  table.mx td.tdh.sub input:focus{background:var(--green-light)}
+  table.mx td.tdw{width:90px;background:var(--surface2)}
+  table.mx td.tdw input{width:100%;border:none;outline:none;font-family:var(--mono);font-size:11px;color:var(--text2);padding:6px 7px;background:transparent}
+  table.mx td.tdt{width:64px;text-align:center;background:var(--accent-light);font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);padding:6px 7px}
+  .tr-tot td{background:var(--surface2)!important;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);padding:7px;text-align:center;border-top:2px solid var(--border-strong)!important}
+  .tr-tot td:first-child{text-align:left;color:var(--text2);font-size:10px;letter-spacing:0.05em}
 
   /* SECTIONS */
-  .sections-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-  .section-card.full-width{grid-column:1/-1}
-  .section-header{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-  .section-title{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2)}
-  .section-body{padding:11px 13px}
-  .section-body textarea{width:100%;border:1px solid var(--border);border-radius:4px;padding:7px 9px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);resize:vertical;min-height:70px;line-height:1.6}
-  .section-body textarea:focus{outline:none;border-color:var(--border-strong)}
-  .list-item{display:flex;align-items:center;gap:7px;margin-bottom:7px}
-  .list-item input{border:1px solid var(--border);border-radius:3px;padding:4px 7px;font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface)}
-  .list-item input:focus{outline:none;border-color:var(--border-strong)}
-  .li-desc{flex:3}.li-qty{flex:1;text-align:center}.li-unit{flex:1}.li-supplier{flex:2}
-  .list-labels{display:flex;gap:7px;margin-bottom:5px;font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.05em;text-transform:uppercase}
-  .list-labels span{flex:3}
-  .list-labels span:nth-child(2){flex:1;text-align:center}
-  .list-labels span:nth-child(3){flex:1}
-  .list-labels span:nth-child(4){flex:2}
-  .inv-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:10px}
-  .inv-tab{font-size:11px;padding:5px 11px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent}
-  .inv-tab:hover{color:var(--text)}
-  .inv-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-  .inv-panel{display:none}
-  .inv-panel.active{display:block}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .sc{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .sc.fw{grid-column:1/-1}
+  .sch{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .sct{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2)}
+  .scb{padding:11px 13px}
+  .scb textarea{width:100%;border:1px solid var(--border);border-radius:4px;padding:7px 9px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);resize:vertical;min-height:70px;line-height:1.6}
+  .scb textarea:focus{outline:none;border-color:var(--border-strong)}
+  .li{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+  .li input{border:1px solid var(--border);border-radius:3px;padding:4px 7px;font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface)}
+  .li input:focus{outline:none;border-color:var(--border-strong)}
+  .lid{flex:3}.liq{flex:1;text-align:center}.liu{flex:1}.lis{flex:2}
+  .llbl{display:flex;gap:7px;margin-bottom:5px;font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.05em;text-transform:uppercase}
+  .llbl span{flex:3}
+  .llbl span:nth-child(2){flex:1;text-align:center}
+  .llbl span:nth-child(3){flex:1}
+  .llbl span:nth-child(4){flex:2}
+  .itabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:10px}
+  .itab{font-size:11px;padding:5px 11px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent}
+  .itab:hover{color:var(--text)}
+  .itab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .ipanel{display:none}
+  .ipanel.active{display:block}
+  .rmv{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+  .rmv:hover{background:#fee;border-color:#c0392b;color:#c0392b}
 
-  /* RESOURCE GROUPS */
-  .resource-mgmt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-  .resource-group{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px}
-  .resource-group-title{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--border)}
-  .rg-title-labour{color:var(--accent2)}.rg-title-plant{color:var(--amber)}.rg-title-sub{color:var(--green)}
-  .resource-item{display:flex;align-items:center;gap:5px;margin-bottom:5px}
-  .resource-item input{flex:1;border:1px solid var(--border);border-radius:3px;padding:4px 7px;font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface)}
-  .resource-item input:focus{outline:none;border-color:var(--border-strong)}
-  .remove-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-  .remove-btn:hover{background:#fee;border-color:#c0392b;color:#c0392b}
+  /* RESOURCES MODAL */
+  .res-mgmt{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .rg{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px}
+  .rgt{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+  .rgt-l{color:var(--accent2)}.rgt-p{color:var(--amber)}.rgt-s{color:var(--green)}
+  .ri{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+  .ri input{flex:1;border:1px solid var(--border);border-radius:3px;padding:4px 7px;font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface)}
+  .ri input:focus{outline:none;border-color:var(--border-strong)}
 
   /* DASHBOARD */
-  .dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-  .dash-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:13px}
-  .dash-card-label{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px}
-  .dash-card-value{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text)}
-  .dash-card-sub{font-size:11px;color:var(--text3);margin-top:2px}
-  .wbs-table{width:100%;border-collapse:collapse;font-size:12px}
-  .wbs-table th{text-align:left;padding:6px 9px;background:var(--surface2);font-size:10px;font-weight:500;letter-spacing:0.05em;color:var(--text2);border:1px solid var(--border)}
-  .wbs-table td{padding:6px 9px;border:1px solid var(--border);color:var(--text)}
-  .wbs-table tr:nth-child(even) td{background:var(--bg)}
-  .wbs-table .mono{font-family:var(--mono);color:var(--text2)}
-
-  /* MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center}
-  .modal-overlay.open{display:flex}
-  .modal{background:var(--surface);border-radius:8px;padding:22px;width:460px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto}
-  .modal h3{font-size:15px;font-weight:500;margin-bottom:14px}
-  .modal label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px;font-weight:500}
-  .modal input,.modal select{width:100%;border:1px solid var(--border);border-radius:4px;padding:7px 9px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);margin-bottom:11px}
-  .modal input:focus,.modal select:focus{outline:none;border-color:var(--border-strong)}
-  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+  .dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .dc{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:13px}
+  .dcl{font-size:10px;color:var(--text3);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px}
+  .dcv{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text)}
+  .dcs{font-size:11px;color:var(--text3);margin-top:2px}
+  .wtbl{width:100%;border-collapse:collapse;font-size:12px}
+  .wtbl th{text-align:left;padding:6px 9px;background:var(--surface2);font-size:10px;font-weight:500;letter-spacing:0.05em;color:var(--text2);border:1px solid var(--border)}
+  .wtbl td{padding:6px 9px;border:1px solid var(--border);color:var(--text)}
+  .wtbl tr:nth-child(even) td{background:var(--bg)}
+  .mono{font-family:var(--mono);color:var(--text2)}
 
   /* JOBS */
-  .jobs-list{display:grid;gap:9px}
-  .job-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.15s}
-  .job-card:hover{border-color:var(--border-strong)}
-  .job-card.active-job{border-color:var(--accent);background:var(--accent-light)}
-  .job-card-name{font-weight:500;font-size:14px;margin-bottom:2px}
-  .job-card-meta{font-size:11px;color:var(--text3);font-family:var(--mono)}
-  .job-card-actions{display:flex;gap:6px}
-  .tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;letter-spacing:0.05em;text-transform:uppercase}
-  .tag-active{background:var(--accent-light);color:var(--accent)}
+  .jlist{display:grid;gap:9px}
+  .jcard{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.15s}
+  .jcard:hover{border-color:var(--border-strong)}
+  .jcard.active{border-color:var(--accent);background:var(--accent-light)}
+  .jname{font-weight:500;font-size:14px;margin-bottom:2px}
+  .jmeta{font-size:11px;color:var(--text3);font-family:var(--mono)}
+  .jacts{display:flex;gap:6px}
+  .tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;letter-spacing:0.05em;text-transform:uppercase;background:var(--accent-light);color:var(--accent)}
 
-  /* NOTICE */
-  .notice{background:var(--amber-light);border:1px solid #e8c88a;border-radius:6px;padding:12px 14px;font-size:12px;color:var(--amber);line-height:1.6;margin-bottom:14px}
-  .notice strong{font-weight:600}
-  .error-msg{color:#c0392b;font-size:12px;margin-top:6px;display:none}
+  /* MODAL */
+  .mo{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center}
+  .mo.open{display:flex}
+  .md{background:var(--surface);border-radius:8px;padding:22px;width:480px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto}
+  .md h3{font-size:15px;font-weight:500;margin-bottom:14px}
+  .md label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px;font-weight:500}
+  .md input,.md select{width:100%;border:1px solid var(--border);border-radius:4px;padding:7px 9px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);margin-bottom:11px}
+  .md input:focus,.md select:focus{outline:none;border-color:var(--border-strong)}
+  .macts{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+
+  .notice{border-radius:6px;padding:11px 14px;font-size:12px;line-height:1.6;border-left:4px solid;margin:10px 0}
+  .n-amber{background:var(--amber-light);border-color:var(--amber);color:#5a3a05}
+  .n-green{background:var(--green-light);border-color:var(--green);color:#1a3d24}
+  .n-blue{background:var(--accent2-light);border-color:var(--accent2);color:#0e3a5a}
 </style>
 </head>
 <body>
 
-<!-- ═══ SETUP SCREEN ═══ -->
+<!-- ══ SETUP SCREEN ══ -->
 <div class="setup-screen" id="setupScreen">
   <div class="setup-card">
-    <h2>Site Diary — SharePoint Setup</h2>
-    <p class="subtitle">Before you sign in, you need to register this app in Azure AD and create two SharePoint lists. This is a one-time setup. After that, paste your App (Client) ID below and click Sign In.</p>
+    <h2>Site Diary</h2>
+    <p class="sub">Sign in with GitHub to access your construction diary. One-time setup takes 3 minutes.</p>
 
     <div class="setup-steps">
-      <h3>One-Time Setup Steps</h3>
+      <h3>One-time GitHub OAuth setup</h3>
       <div class="setup-step">
-        <div class="step-num">1</div>
-        <div>Go to <strong>portal.azure.com</strong> → Azure Active Directory → App Registrations → New Registration. Name it <em>Site Diary</em>. Set Redirect URI to <strong>Single-page application (SPA)</strong> and paste the URL where this HTML file is hosted.</div>
+        <div class="sn">1</div>
+        <div>Go to <strong>github.com/settings/developers</strong> → <strong>OAuth Apps</strong> → <strong>New OAuth App</strong></div>
       </div>
       <div class="setup-step">
-        <div class="step-num">2</div>
-        <div>In the app registration, go to <strong>API Permissions</strong> → Add → Microsoft Graph → Delegated → add <code>Sites.ReadWrite.All</code>. Then grant admin consent.</div>
+        <div class="sn">2</div>
+        <div>Fill in: <strong>Application name:</strong> Site Diary &nbsp;|&nbsp; <strong>Homepage URL:</strong> <code>https://dylashsav-beep.github.io/site-diary/</code> &nbsp;|&nbsp; <strong>Callback URL:</strong> <code>https://dylashsav-beep.github.io/site-diary/</code></div>
       </div>
       <div class="setup-step">
-        <div class="step-num">3</div>
-        <div>Go to your SharePoint site → <strong>Site Contents → New → List</strong>. Create a list named exactly <code>SiteDiaryJobs</code>. Add columns: <code>JobNumber</code> (text), <code>Client</code> (text), <code>LRate</code> (number), <code>PRate</code> (number), <code>SRate</code> (number), <code>Resources</code> (multiple lines of text).</div>
+        <div class="sn">3</div>
+        <div>Click <strong>Register application</strong>. Then click <strong>Generate a new client secret</strong>. Copy both the <strong>Client ID</strong> and <strong>Client Secret</strong>.</div>
       </div>
       <div class="setup-step">
-        <div class="step-num">4</div>
-        <div>Create a second list named exactly <code>SiteDiaryEntries</code>. Add columns: <code>JobId</code> (number), <code>DiaryDate</code> (date), <code>Weather</code> (text), <code>Activities</code> (multiple lines), <code>Hours</code> (multiple lines), <code>GeneralNotes</code> (multiple lines), <code>Deliveries</code> (multiple lines), <code>Inventory</code> (multiple lines).</div>
-      </div>
-      <div class="setup-step">
-        <div class="step-num">5</div>
-        <div>Copy the <strong>Application (Client) ID</strong> from your app registration overview and paste it below.</div>
+        <div class="sn">4</div>
+        <div>Paste them below and click Sign In. GitHub will ask you to authorise the app once.</div>
       </div>
     </div>
 
+    <div class="notice n-amber">
+      <strong>Note:</strong> Because GitHub OAuth requires a server for the secret exchange, we use <strong>Netlify Functions</strong> as a free middleman — just for the login step. Your data still lives entirely in your GitHub repo. See the setup guide for the 5-minute Netlify step.
+    </div>
+
     <div class="field-group">
-      <label>Azure App (Client) ID</label>
-      <input type="text" id="clientIdInput" placeholder="e.g. 12345678-abcd-1234-efgh-123456789012" />
-      <div class="hint">Found in Azure Portal → App Registrations → your app → Overview</div>
+      <label>GitHub OAuth Client ID</label>
+      <input type="text" id="ghClientId" placeholder="e.g. Ov23liABCDEF123456" />
+      <div class="hint">From github.com/settings/developers → your OAuth App</div>
     </div>
     <div class="field-group">
-      <label>SharePoint Site URL</label>
-      <input type="text" id="siteUrlInput" value="https://paperflexnl.sharepoint.com/sites/Main" />
+      <label>GitHub Repo (owner/repo)</label>
+      <input type="text" id="ghRepo" value="dylashsav-beep/site-diary" />
+      <div class="hint">Where diary data JSON files will be stored</div>
     </div>
-    <div class="error-msg" id="setupError">Could not sign in. Please check your Client ID and try again.</div>
-    <button class="btn btn-accent" style="width:100%;padding:10px;font-size:13px" onclick="startSignIn()">Sign In with Microsoft 365</button>
-    <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">A Microsoft login popup will appear &mdash; allow popups if your browser asks.</p>
-    <div style="background:#fdf5e0;border:1px solid #e8c88a;border-radius:6px;padding:10px 12px;margin-top:10px;font-size:12px;color:#5a3a05;line-height:1.6">
-      <strong>Azure reminder:</strong> Make sure your GitHub Pages URL is listed as a redirect URI under <strong>Single-page application</strong> in Azure &rarr; App Registrations &rarr; Site Diary &rarr; Authentication. Your URL is: <code style="background:rgba(0,0,0,0.08);padding:1px 4px;border-radius:3px;font-family:monospace">https://dylashsav-beep.github.io/site-diary/</code>
+    <div class="field-group">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+      <div class="hint">github.com/settings/tokens → Generate new token (classic) → tick <strong>repo</strong> scope. This stays in your browser only.</div>
     </div>
+    <div class="err" id="setupErr"></div>
+    <button class="btn btn-accent" style="width:100%;padding:10px;font-size:13px;margin-top:4px" onclick="startApp()">Enter Site Diary</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;text-align:center">Your token is stored in your browser only — never sent anywhere except GitHub's API directly.</p>
   </div>
 </div>
 
-<!-- ═══ LOADING SCREEN ═══ -->
+<!-- ══ LOADING ══ -->
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">Signing in...</div>
+  <div class="loading-text" id="loadingText">Loading...</div>
 </div>
 
-<!-- ═══ APP ═══ -->
+<!-- ══ APP ══ -->
 <div class="app-screen" id="appScreen">
 
   <div class="header">
-    <div class="header-logo">SITE<span>DIARY</span></div>
-    <div class="header-sep"></div>
-    <select class="job-select" id="jobSelect" onchange="switchJob(this.value)"></select>
-    <div class="spacer"></div>
-    <span class="save-indicator save-ok" id="saveIndicator">● Saved</span>
-    <div class="header-sep"></div>
+    <div class="logo">SITE<span>DIARY</span></div>
+    <div class="hsep"></div>
+    <select class="job-sel" id="jobSelect" onchange="switchJob(this.value)"></select>
+    <div class="sp"></div>
+    <span class="save-ind si-ok" id="saveInd">● Saved</span>
+    <div class="hsep"></div>
     <span class="user-badge" id="userBadge"></span>
-    <button class="btn btn-ghost btn-sm" onclick="openTab('jobs')">&#9776; Jobs</button>
+    <button class="btn btn-ghost btn-sm" onclick="goTab('jobs')">&#9776; Jobs</button>
     <button class="btn btn-accent btn-sm" onclick="exportDay()">↓ Export</button>
     <button class="btn btn-ghost btn-sm" onclick="signOut()">Sign Out</button>
   </div>
 
   <div class="day-nav">
     <button class="nav-btn" onclick="prevDay()">&#8592;</button>
-    <div>
-      <span class="day-label" id="dayLabel">—</span>
-      <span class="day-sub" id="dayNumber"></span>
-    </div>
+    <span class="day-label" id="dayLabel">—</span>
     <button class="nav-btn" onclick="nextDay()">&#8594;</button>
-    <button class="btn btn-outline btn-sm" onclick="goToToday()">Today</button>
+    <button class="btn btn-outline btn-sm" onclick="goToday()">Today</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <span style="font-size:11px;color:var(--text3)">Weather:</span>
-      <select class="weather-select" id="weatherSelect" onchange="queueSave()">
+      <select class="weather-sel" id="weatherSel" onchange="queueSave()">
         <option>☀️ Sunny</option><option>⛅ Partly Cloudy</option><option>☁️ Overcast</option>
         <option>🌧️ Rain</option><option>⛈️ Heavy Rain</option><option>🌫️ Fog</option>
         <option>❄️ Snow/Frost</option><option>💨 High Wind</option>
       </select>
     </div>
-    <button class="btn btn-outline btn-sm" onclick="openResourceModal()">⚙ Resources</button>
-    <button class="btn btn-accent btn-sm" onclick="addActivityRow()">+ Activity</button>
+    <button class="btn btn-outline btn-sm" onclick="openResModal()">⚙ Resources</button>
+    <button class="btn btn-accent btn-sm" onclick="addRow()">+ Activity</button>
   </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="openTab('diary')">Daily Diary</div>
-    <div class="tab" onclick="openTab('dashboard')">Dashboard</div>
-    <div class="tab" onclick="openTab('jobs')">Jobs</div>
+    <div class="tab active" onclick="goTab('diary')">Daily Diary</div>
+    <div class="tab" onclick="goTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="goTab('jobs')">Jobs</div>
   </div>
 
   <div class="main">
 
     <!-- DIARY -->
-    <div class="tab-panel active" id="tab-diary">
-      <div class="matrix-header">
-        <span class="matrix-title">Hours Matrix</span>
-        <span class="text-muted">— Enter hours at each activity/resource intersection</span>
+    <div class="tp active" id="tab-diary">
+      <div class="mhdr">
+        <span class="mtitle">Hours Matrix</span>
+        <span class="muted">— enter hours at each activity / resource intersection</span>
       </div>
-      <div class="table-wrap">
-        <table class="matrix"><thead id="matrixHead"></thead><tbody id="matrixBody"></tbody><tfoot id="matrixFoot"></tfoot></table>
+      <div class="twrap">
+        <table class="mx"><thead id="mxHead"></thead><tbody id="mxBody"></tbody><tfoot id="mxFoot"></tfoot></table>
       </div>
-      <div class="sections-grid">
-        <div class="section-card full-width">
-          <div class="section-header"><span class="section-title">General Notes</span></div>
-          <div class="section-body"><textarea id="generalNotes" rows="4" placeholder="Describe what happened on site today..." oninput="queueSave()"></textarea></div>
+      <div class="sgrid">
+        <div class="sc fw">
+          <div class="sch"><span class="sct">General Notes</span></div>
+          <div class="scb"><textarea id="genNotes" rows="4" placeholder="Describe what happened on site today — progress, issues, decisions, visitors, instructions received..." oninput="queueSave()"></textarea></div>
         </div>
-        <div class="section-card">
-          <div class="section-header"><span class="section-title">Deliveries</span><button class="btn btn-outline btn-sm" onclick="addDelivery()">+ Add</button></div>
-          <div class="section-body">
-            <div class="list-labels"><span>Description</span><span>Qty</span><span>Unit</span><span>Supplier</span></div>
-            <div id="deliveryList"></div>
+        <div class="sc">
+          <div class="sch"><span class="sct">Deliveries</span><button class="btn btn-outline btn-sm" onclick="addDelivery()">+ Add</button></div>
+          <div class="scb">
+            <div class="llbl"><span>Description</span><span>Qty</span><span>Unit</span><span>Supplier</span></div>
+            <div id="delivList"></div>
           </div>
         </div>
-        <div class="section-card">
-          <div class="section-header"><span class="section-title">Site Inventory</span><button class="btn btn-outline btn-sm" onclick="addInventoryItem()">+ Add</button></div>
-          <div class="section-body">
-            <div class="inv-tabs">
-              <div class="inv-tab active" onclick="switchInvTab('materials')">Materials</div>
-              <div class="inv-tab" onclick="switchInvTab('smallplant')">Small Plant</div>
-              <div class="inv-tab" onclick="switchInvTab('general')">General Items</div>
+        <div class="sc">
+          <div class="sch"><span class="sct">Site Inventory</span><button class="btn btn-outline btn-sm" onclick="addInvItem()">+ Add</button></div>
+          <div class="scb">
+            <div class="itabs">
+              <div class="itab active" onclick="switchInv('materials')">Materials</div>
+              <div class="itab" onclick="switchInv('smallplant')">Small Plant</div>
+              <div class="itab" onclick="switchInv('general')">General</div>
             </div>
-            <div class="inv-panel active" id="inv-materials"></div>
-            <div class="inv-panel" id="inv-smallplant"></div>
-            <div class="inv-panel" id="inv-general"></div>
+            <div class="ipanel active" id="inv-materials"></div>
+            <div class="ipanel" id="inv-smallplant"></div>
+            <div class="ipanel" id="inv-general"></div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- DASHBOARD -->
-    <div class="tab-panel" id="tab-dashboard">
-      <div class="dash-grid" id="dashCards"></div>
-      <div class="section-card">
-        <div class="section-header"><span class="section-title">WBS Summary — Hours &amp; Cost by BOQ Item</span></div>
-        <div class="section-body">
-          <table class="wbs-table"><thead><tr><th>WBS Code</th><th>Activity</th><th>Labour Hrs</th><th>Plant Hrs</th><th>Subcon Hrs</th><th>Total Hrs</th><th>Est. Cost (£)</th></tr></thead><tbody id="wbsBody"></tbody></table>
+    <div class="tp" id="tab-dashboard">
+      <div class="dgrid" id="dashCards"></div>
+      <div class="sc">
+        <div class="sch"><span class="sct">WBS Summary — Hours &amp; Cost by BOQ Item</span></div>
+        <div class="scb">
+          <table class="wtbl"><thead><tr><th>WBS Code</th><th>Activity</th><th>Labour Hrs</th><th>Plant Hrs</th><th>Subcon Hrs</th><th>Total Hrs</th><th>Est. Cost (£)</th></tr></thead><tbody id="wbsBody"></tbody></table>
         </div>
       </div>
     </div>
 
     <!-- JOBS -->
-    <div class="tab-panel" id="tab-jobs">
+    <div class="tp" id="tab-jobs">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <h2 style="font-size:15px;font-weight:500">Job Management</h2>
-        <button class="btn btn-accent" onclick="openNewJobModal()">+ New Job</button>
+        <button class="btn btn-accent" onclick="openNewJob()">+ New Job</button>
       </div>
-      <div class="jobs-list" id="jobsList"></div>
+      <div class="jlist" id="jobsList"></div>
     </div>
 
   </div>
 </div>
 
 <!-- RESOURCE MODAL -->
-<div class="modal-overlay" id="resourceModal">
-  <div class="modal" style="width:560px">
+<div class="mo" id="resModal">
+  <div class="md" style="width:560px">
     <h3>Manage Resources</h3>
-    <div class="resource-mgmt" id="resourceMgmt"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('resourceModal')">Cancel</button>
-      <button class="btn btn-accent" onclick="applyResources()">Apply &amp; Save</button>
+    <div class="res-mgmt" id="resMgmt"></div>
+    <div class="macts">
+      <button class="btn btn-outline" onclick="closeModal('resModal')">Cancel</button>
+      <button class="btn btn-accent" onclick="applyRes()">Apply &amp; Save</button>
     </div>
   </div>
 </div>
 
 <!-- NEW JOB MODAL -->
-<div class="modal-overlay" id="newJobModal">
-  <div class="modal">
+<div class="mo" id="newJobModal">
+  <div class="md">
     <h3>New Job</h3>
-    <label>Job Name</label><input type="text" id="newJobName" placeholder="e.g. Paddington Station Phase 2">
-    <label>Job Number</label><input type="text" id="newJobNumber" placeholder="e.g. JB-2025-042">
-    <label>Client</label><input type="text" id="newJobClient" placeholder="e.g. Network Rail">
-    <label>Labour Rate (£/hr)</label><input type="number" id="newJobLRate" value="45">
-    <label>Plant Rate (£/hr)</label><input type="number" id="newJobPRate" value="85">
-    <label>Subcon Rate (£/hr)</label><input type="number" id="newJobSRate" value="55">
-    <div class="modal-actions">
+    <label>Job Name</label><input type="text" id="njName" placeholder="e.g. Paddington Station Phase 2">
+    <label>Job Number / Reference</label><input type="text" id="njNum" placeholder="e.g. JB-2025-042">
+    <label>Client</label><input type="text" id="njClient" placeholder="e.g. Network Rail">
+    <label>Labour Rate (£/hr)</label><input type="number" id="njLRate" value="45">
+    <label>Plant Rate (£/hr)</label><input type="number" id="njPRate" value="85">
+    <label>Subcon Rate (£/hr)</label><input type="number" id="njSRate" value="55">
+    <div class="macts">
       <button class="btn btn-outline" onclick="closeModal('newJobModal')">Cancel</button>
       <button class="btn btn-accent" onclick="saveNewJob()">Create Job</button>
     </div>
@@ -380,826 +376,675 @@
 </div>
 
 <script>
-// ─── CONFIG (set by user on setup screen) ────────────────────────────────────
-let CLIENT_ID = localStorage.getItem('sd_client_id') || '';
-let SITE_URL   = localStorage.getItem('sd_site_url')  || 'https://paperflexnl.sharepoint.com/sites/Main';
-const TENANT   = 'paperflexnl';
-let msalInstance = null;
-let accessToken  = null;
-let currentUser  = '';
+// ══════════════════════════════════════════════════════════
+// CONFIG & STATE
+// ══════════════════════════════════════════════════════════
+let GH_TOKEN = '';
+let GH_REPO  = 'dylashsav-beep/site-diary';
+let GH_USER  = '';
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
 let jobs        = [];
 let currentJobId = null;
 let currentDate  = todayStr();
-let dayCache     = {};   // key: "jobId|date" → day object
+let dayCache     = {};  // "jobId|date" → day object + sha
 let saveTimer    = null;
-let currentInvTab = 'materials';
+let curInvTab    = 'materials';
 
-function todayStr() {
-  return new Date().toISOString().slice(0,10);
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function ck(jobId, date) { return `${jobId}|${date}`; }
+function curJob() { return jobs.find(j => j.id === currentJobId); }
+
+// ══════════════════════════════════════════════════════════
+// GITHUB API
+// ══════════════════════════════════════════════════════════
+const GH_API = 'https://api.github.com';
+
+async function ghGet(path) {
+  const r = await fetch(`${GH_API}${path}`, {
+    headers: { 'Authorization': `token ${GH_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub GET ${r.status}: ${path}`);
+  return r.json();
 }
-function cacheKey(jobId, date) { return `${jobId}|${date}`; }
-function currentJob() { return jobs.find(j => j.id == currentJobId); }
 
-// ─── MSAL SETUP ───────────────────────────────────────────────────────────────
-function initMsal(clientId, siteUrl) {
-  CLIENT_ID = clientId;
-  SITE_URL  = siteUrl;
-  localStorage.setItem('sd_client_id', CLIENT_ID);
-  localStorage.setItem('sd_site_url',  SITE_URL);
-  const msalConfig = {
-    auth: {
-      clientId: CLIENT_ID,
-      authority: `https://login.microsoftonline.com/${TENANT}.onmicrosoft.com`,
-      redirectUri: window.location.origin + window.location.pathname
-    },
-    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+async function ghPut(path, content, sha, message) {
+  const body = {
+    message,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+    branch: 'main'
   };
-  msalInstance = new msal.PublicClientApplication(msalConfig);
+  if (sha) body.sha = sha;
+  const r = await fetch(`${GH_API}${path}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${GH_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(`GitHub PUT ${r.status}: ${err.message || path}`);
+  }
+  return r.json();
 }
 
-// SharePoint scope — must match your tenant
-const SCOPES = [
-  'https://paperflexnl.sharepoint.com/AllSites.Write',
-  'https://paperflexnl.sharepoint.com/AllSites.Read',
-  'User.Read'
-];
+async function ghRead(path) {
+  const data = await ghGet(`/repos/${GH_REPO}/contents/${path}`);
+  if (!data) return { content: null, sha: null };
+  const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g,'')))));
+  return { content, sha: data.sha };
+}
 
-async function startSignIn() {
-  const clientId = document.getElementById('clientIdInput').value.trim();
-  const siteUrl  = document.getElementById('siteUrlInput').value.trim();
-  const errEl = document.getElementById('setupError');
+async function ghWrite(path, content, sha, message) {
+  const result = await ghPut(`/repos/${GH_REPO}/contents/${path}`, content, sha, message);
+  return result.content.sha;
+}
+
+// ══════════════════════════════════════════════════════════
+// AUTH / BOOT
+// ══════════════════════════════════════════════════════════
+async function startApp() {
+  const token    = document.getElementById('ghToken').value.trim();
+  const repo     = document.getElementById('ghRepo').value.trim();
+  const errEl    = document.getElementById('setupErr');
   errEl.style.display = 'none';
-  if (!clientId) { alert('Please enter your Azure App Client ID.'); return; }
-  initMsal(clientId, siteUrl);
-  try {
-    // Use popup — works reliably on GitHub Pages without redirect issues
-    const result = await msalInstance.loginPopup({ scopes: SCOPES });
-    if (result && result.account) {
-      await acquireToken(result.account);
-    }
-  } catch(e) {
-    showSetup();
-    errEl.style.display = 'block';
-    if (e.message && e.message.includes('popup_window_error')) {
-      errEl.textContent = 'Popup was blocked. Please allow popups for this site in your browser and try again.';
-    } else if (e.message && e.message.includes('user_cancelled')) {
-      errEl.textContent = 'Sign-in was cancelled. Please try again.';
-    } else {
-      errEl.textContent = 'Sign-in error: ' + (e.message || e);
-    }
-  }
-}
 
-async function handleRedirect() {
-  // With popup flow we just check if already signed in from a previous session
-  if (!CLIENT_ID) { showSetup(); return; }
-  initMsal(CLIENT_ID, SITE_URL);
-  try {
-    // Handle any redirect response (fallback)
-    await msalInstance.handleRedirectPromise();
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      showLoading('Resuming session...');
-      await acquireToken(accounts[0]);
-    } else {
-      showSetup();
-    }
-  } catch(e) {
-    showSetup();
-  }
-}
+  if (!token) { showErr('Please enter your GitHub Personal Access Token.'); return; }
 
-async function acquireToken(account) {
+  GH_TOKEN = token;
+  GH_REPO  = repo;
+
+  localStorage.setItem('sd_gh_token', GH_TOKEN);
+  localStorage.setItem('sd_gh_repo',  GH_REPO);
+
+  showLoading('Verifying GitHub access...');
   try {
-    const result = await msalInstance.acquireTokenSilent({ scopes: SCOPES, account });
-    accessToken = result.accessToken;
-    currentUser = account.name || account.username;
-    document.getElementById('userBadge').textContent = currentUser;
+    const user = await ghGet('/user');
+    if (!user || !user.login) throw new Error('Invalid token — could not get GitHub user.');
+    GH_USER = user.login;
+    document.getElementById('userBadge').textContent = GH_USER;
     showLoading('Loading diary data...');
     await loadAllData();
     showApp();
   } catch(e) {
-    // Silent failed — try popup to refresh
-    try {
-      const result = await msalInstance.acquireTokenPopup({ scopes: SCOPES, account });
-      accessToken = result.accessToken;
-      currentUser = account.name || account.username;
-      document.getElementById('userBadge').textContent = currentUser;
-      showLoading('Loading diary data...');
-      await loadAllData();
-      showApp();
-    } catch(e2) {
-      showSetup();
-      document.getElementById('setupError').style.display = 'block';
-      document.getElementById('setupError').textContent = 'Session expired. Please sign in again.';
-    }
+    showSetup();
+    showErr(e.message || 'Could not connect to GitHub. Check your token and repo name.');
+  }
+}
+
+async function autoLogin() {
+  const token = localStorage.getItem('sd_gh_token');
+  const repo  = localStorage.getItem('sd_gh_repo');
+  if (!token) { showSetup(); return; }
+  GH_TOKEN = token;
+  GH_REPO  = repo || 'dylashsav-beep/site-diary';
+  document.getElementById('ghToken').value = token;
+  document.getElementById('ghRepo').value  = GH_REPO;
+  showLoading('Resuming session...');
+  try {
+    const user = await ghGet('/user');
+    if (!user || !user.login) throw new Error('Token expired');
+    GH_USER = user.login;
+    document.getElementById('userBadge').textContent = GH_USER;
+    showLoading('Loading diary data...');
+    await loadAllData();
+    showApp();
+  } catch(e) {
+    localStorage.removeItem('sd_gh_token');
+    showSetup();
   }
 }
 
 function signOut() {
-  if (msalInstance) {
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      msalInstance.logoutPopup({ account: accounts[0] }).then(() => {
-        showSetup();
-      });
-    }
-  }
+  localStorage.removeItem('sd_gh_token');
+  GH_TOKEN = ''; GH_USER = ''; jobs = []; dayCache = {};
+  showSetup();
 }
 
-// ─── SHAREPOINT API ──────────────────────────────────────────────────────────
-const SP_API = () => `${SITE_URL}/_api/web/lists`;
+// ══════════════════════════════════════════════════════════
+// DATA — JOBS
+// ══════════════════════════════════════════════════════════
+const JOBS_PATH = 'data/jobs.json';
 
-async function spGet(url) {
-  const r = await fetch(url, {
-    headers: { 'Accept': 'application/json;odata=verbose', 'Authorization': `Bearer ${accessToken}` }
-  });
-  if (!r.ok) throw new Error(`SP GET ${r.status}: ${await r.text()}`);
-  return r.json();
-}
-
-async function spPost(url, body) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json;odata=verbose',
-      'Content-Type': 'application/json;odata=verbose',
-      'Authorization': `Bearer ${accessToken}`,
-      'X-RequestDigest': await getFormDigest()
-    },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) throw new Error(`SP POST ${r.status}: ${await r.text()}`);
-  return r.json();
-}
-
-async function spPatch(url, body) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json;odata=verbose',
-      'Content-Type': 'application/json;odata=verbose',
-      'Authorization': `Bearer ${accessToken}`,
-      'X-RequestDigest': await getFormDigest(),
-      'X-HTTP-Method': 'MERGE',
-      'If-Match': '*'
-    },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok && r.status !== 204) throw new Error(`SP PATCH ${r.status}`);
-}
-
-async function spDelete(url) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'X-RequestDigest': await getFormDigest(),
-      'X-HTTP-Method': 'DELETE',
-      'If-Match': '*'
-    }
-  });
-  if (!r.ok && r.status !== 204) throw new Error(`SP DELETE ${r.status}`);
-}
-
-let _digest = null, _digestExpiry = 0;
-async function getFormDigest() {
-  if (_digest && Date.now() < _digestExpiry) return _digest;
-  const r = await fetch(`${SITE_URL}/_api/contextinfo`, {
-    method: 'POST',
-    headers: { 'Accept': 'application/json;odata=verbose', 'Authorization': `Bearer ${accessToken}` }
-  });
-  const d = await r.json();
-  _digest = d.d.GetContextWebInformation.FormDigestValue;
-  _digestExpiry = Date.now() + 25 * 60 * 1000;
-  return _digest;
-}
-
-// ─── DATA LOAD ────────────────────────────────────────────────────────────────
 async function loadAllData() {
   try {
-    // Load jobs
-    const jobsData = await spGet(`${SP_API()}/getbytitle('SiteDiaryJobs')/items?$select=Id,Title,JobNumber,Client,LRate,PRate,SRate,Resources&$orderby=Created`);
-    jobs = (jobsData.d.results || []).map(item => ({
-      id: item.Id,
-      name: item.Title || '',
-      number: item.JobNumber || '',
-      client: item.Client || '',
-      lRate: parseFloat(item.LRate) || 45,
-      pRate: parseFloat(item.PRate) || 85,
-      sRate: parseFloat(item.SRate) || 55,
-      resources: safeParseJson(item.Resources, { labour: ['Gang A'], plant: ['Crane'], sub: [] })
-    }));
-
-    if (jobs.length === 0) {
-      // Create a default starter job
-      await createJobInSP('My First Job', 'JB-001', '', 45, 85, 55, { labour: ['Gang A', 'Gang B'], plant: ['Crane'], sub: [] });
-      const jobsData2 = await spGet(`${SP_API()}/getbytitle('SiteDiaryJobs')/items?$select=Id,Title,JobNumber,Client,LRate,PRate,SRate,Resources&$orderby=Created`);
-      jobs = (jobsData2.d.results || []).map(item => ({
-        id: item.Id,
-        name: item.Title || '',
-        number: item.JobNumber || '',
-        client: item.Client || '',
-        lRate: parseFloat(item.LRate) || 45,
-        pRate: parseFloat(item.PRate) || 85,
-        sRate: parseFloat(item.SRate) || 55,
-        resources: safeParseJson(item.Resources, { labour: ['Gang A'], plant: ['Crane'], sub: [] })
-      }));
+    const { content, sha } = await ghRead(JOBS_PATH);
+    if (content && Array.isArray(content)) {
+      jobs = content;
+      jobs._sha = sha;
+    } else {
+      // First time — create default job
+      jobs = [{
+        id: 'job_' + Date.now(),
+        name: 'My First Job',
+        number: 'JB-001',
+        client: '',
+        lRate: 45, pRate: 85, sRate: 55,
+        resources: { labour: ['Gang A', 'Gang B'], plant: ['Crane'], sub: [] }
+      }];
+      jobs._sha = await ghWrite(JOBS_PATH, jobs, null, 'Init: create jobs data');
     }
     currentJobId = jobs[0]?.id || null;
   } catch(e) {
     console.error('Load error:', e);
-    setSaveIndicator('error', 'Load error — check SharePoint lists exist');
+    setSaveInd('err', '⚠ Load failed');
+    throw e;
   }
 }
 
-async function loadDayData(jobId, dateStr) {
-  const key = cacheKey(jobId, dateStr);
+async function saveJobs(message) {
+  const arr = jobs.filter(j => typeof j === 'object' && j.id);
+  try {
+    const newSha = await ghWrite(JOBS_PATH, arr, jobs._sha || null, message || 'Update jobs');
+    jobs._sha = newSha;
+  } catch(e) {
+    // Conflict — refetch sha and retry once
+    const { sha } = await ghRead(JOBS_PATH);
+    jobs._sha = sha;
+    const newSha2 = await ghWrite(JOBS_PATH, arr, sha, message || 'Update jobs');
+    jobs._sha = newSha2;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// DATA — DAY ENTRIES
+// ══════════════════════════════════════════════════════════
+function dayPath(jobId, date) {
+  return `data/${jobId}/${date}.json`;
+}
+
+async function loadDay(jobId, date) {
+  const key = ck(jobId, date);
   if (dayCache[key]) return dayCache[key];
   try {
-    const data = await spGet(`${SP_API()}/getbytitle('SiteDiaryEntries')/items?$select=Id,JobId,DiaryDate,Weather,Activities,Hours,GeneralNotes,Deliveries,Inventory&$filter=JobId eq ${jobId} and DiaryDate eq '${dateStr}T00:00:00Z'`);
-    const items = data.d.results || [];
-    if (items.length > 0) {
-      const item = items[0];
-      const day = {
-        spId: item.Id,
-        weather: item.Weather || '☀️ Sunny',
-        activities: safeParseJson(item.Activities, [{ desc: '', wbs: '' }]),
-        hours: safeParseJson(item.Hours, {}),
-        generalNotes: item.GeneralNotes || '',
-        deliveries: safeParseJson(item.Deliveries, []),
-        inventory: safeParseJson(item.Inventory, { materials: [], smallplant: [], general: [] })
-      };
-      dayCache[key] = day;
-      return day;
+    const { content, sha } = await ghRead(dayPath(jobId, date));
+    if (content) {
+      dayCache[key] = { ...content, _sha: sha };
+      return dayCache[key];
     }
-  } catch(e) { console.error('Day load error:', e); }
-  // New blank day
+  } catch(e) { console.warn('Day load:', e); }
+  // Blank day
   const blank = {
-    spId: null,
     weather: '☀️ Sunny',
     activities: [{ desc: '', wbs: '' }, { desc: '', wbs: '' }, { desc: '', wbs: '' }],
     hours: {},
     generalNotes: '',
     deliveries: [],
-    inventory: { materials: [], smallplant: [], general: [] }
+    inventory: { materials: [], smallplant: [], general: [] },
+    _sha: null
   };
   dayCache[key] = blank;
   return blank;
 }
 
-async function saveDayToSP(jobId, dateStr) {
-  const key = cacheKey(jobId, dateStr);
+async function saveDay(jobId, date) {
+  const key = ck(jobId, date);
   const day = dayCache[key];
   if (!day) return;
-  setSaveIndicator('saving', 'Saving...');
+  setSaveInd('saving', 'Saving...');
   try {
-    const payload = {
-      '__metadata': { 'type': 'SP.Data.SiteDiaryEntriesListItem' },
-      'JobId': jobId,
-      'DiaryDate': dateStr + 'T00:00:00Z',
-      'Weather': day.weather,
-      'Activities': JSON.stringify(day.activities),
-      'Hours': JSON.stringify(day.hours),
-      'GeneralNotes': day.generalNotes,
-      'Deliveries': JSON.stringify(day.deliveries),
-      'Inventory': JSON.stringify(day.inventory)
-    };
-    if (day.spId) {
-      await spPatch(`${SP_API()}/getbytitle('SiteDiaryEntries')/items(${day.spId})`, payload);
-    } else {
-      const result = await spPost(`${SP_API()}/getbytitle('SiteDiaryEntries')/items`, payload);
-      dayCache[key].spId = result.d.Id;
-    }
-    setSaveIndicator('ok', '● Saved');
+    const { _sha, ...data } = day;
+    const newSha = await ghWrite(
+      dayPath(jobId, date), data, _sha,
+      `Diary: ${jobId} ${date}`
+    );
+    dayCache[key]._sha = newSha;
+    setSaveInd('ok', '● Saved');
   } catch(e) {
     console.error('Save error:', e);
-    setSaveIndicator('error', '⚠ Save failed');
+    setSaveInd('err', '⚠ Save failed — check token/permissions');
   }
 }
 
-// ─── JOB SP OPERATIONS ───────────────────────────────────────────────────────
-async function createJobInSP(name, number, client, lRate, pRate, sRate, resources) {
-  const payload = {
-    '__metadata': { 'type': 'SP.Data.SiteDiaryJobsListItem' },
-    'Title': name,
-    'JobNumber': number,
-    'Client': client,
-    'LRate': lRate,
-    'PRate': pRate,
-    'SRate': sRate,
-    'Resources': JSON.stringify(resources)
-  };
-  return spPost(`${SP_API()}/getbytitle('SiteDiaryJobs')/items`, payload);
-}
-
-async function updateJobInSP(job) {
-  const payload = {
-    '__metadata': { 'type': 'SP.Data.SiteDiaryJobsListItem' },
-    'Title': job.name,
-    'JobNumber': job.number,
-    'Client': job.client,
-    'LRate': job.lRate,
-    'PRate': job.pRate,
-    'SRate': job.sRate,
-    'Resources': JSON.stringify(job.resources)
-  };
-  await spPatch(`${SP_API()}/getbytitle('SiteDiaryJobs')/items(${job.id})`, payload);
-}
-
-// ─── UI INIT ─────────────────────────────────────────────────────────────────
-async function showApp() {
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'block';
-  refreshJobSelect();
-  renderJobsList();
-  await loadAndRenderDay();
-}
-
+// ══════════════════════════════════════════════════════════
+// UI — SCREENS
+// ══════════════════════════════════════════════════════════
 function showSetup() {
-  document.getElementById('setupScreen').style.display = 'flex';
+  document.getElementById('setupScreen').style.display  = 'flex';
   document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'none';
-  if (CLIENT_ID) document.getElementById('clientIdInput').value = CLIENT_ID;
-  document.getElementById('siteUrlInput').value = SITE_URL;
+  document.getElementById('appScreen').style.display    = 'none';
+  const saved = localStorage.getItem('sd_gh_token');
+  if (saved) document.getElementById('ghToken').value = saved;
+  const repo = localStorage.getItem('sd_gh_repo');
+  if (repo) document.getElementById('ghRepo').value = repo;
 }
 
 function showLoading(msg) {
+  document.getElementById('setupScreen').style.display  = 'none';
   document.getElementById('loadingScreen').style.display = 'flex';
-  document.getElementById('loadingScreen').style.flexDirection = 'column';
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display    = 'none';
   document.getElementById('loadingText').textContent = msg || 'Loading...';
 }
 
-function setSaveIndicator(state, msg) {
-  const el = document.getElementById('saveIndicator');
-  el.textContent = msg;
-  el.className = 'save-indicator';
-  if (state === 'ok') el.classList.add('save-ok');
-  else if (state === 'saving') el.classList.add('save-saving');
-  else el.classList.add('save-error');
+function showApp() {
+  document.getElementById('setupScreen').style.display  = 'none';
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display    = 'block';
+  refreshJobSel();
+  renderJobsList();
+  loadAndRender();
 }
 
-// ─── DAY NAVIGATION ──────────────────────────────────────────────────────────
+function showErr(msg) {
+  const el = document.getElementById('setupErr');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+function setSaveInd(state, msg) {
+  const el = document.getElementById('saveInd');
+  el.textContent = msg;
+  el.className = 'save-ind';
+  if (state === 'ok') el.classList.add('si-ok');
+  else if (state === 'saving') el.classList.add('si-saving');
+  else el.classList.add('si-err');
+}
+
+// ══════════════════════════════════════════════════════════
+// DAY NAVIGATION
+// ══════════════════════════════════════════════════════════
 function prevDay() { shiftDay(-1); }
 function nextDay() { shiftDay(1); }
-function goToToday() { currentDate = todayStr(); loadAndRenderDay(); }
+function goToday() { currentDate = todayStr(); loadAndRender(); }
 function shiftDay(n) {
   const d = new Date(currentDate + 'T12:00:00');
   d.setDate(d.getDate() + n);
   currentDate = d.toISOString().slice(0,10);
-  loadAndRenderDay();
+  loadAndRender();
+}
+function fmtDate(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
 
-function formatDate(ds) {
-  const d = new Date(ds + 'T12:00:00');
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-}
-
-async function loadAndRenderDay() {
+async function loadAndRender() {
   if (!currentJobId) return;
   showLoading('Loading day...');
-  const day = await loadDayData(currentJobId, currentDate);
+  const day = await loadDay(currentJobId, currentDate);
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
-  document.getElementById('dayLabel').textContent = formatDate(currentDate);
-  document.getElementById('weatherSelect').value = day.weather || '☀️ Sunny';
-  const job = currentJob();
-  buildMatrix(job, day);
-  document.getElementById('generalNotes').value = day.generalNotes || '';
+  document.getElementById('dayLabel').textContent = fmtDate(currentDate);
+  document.getElementById('weatherSel').value = day.weather || '☀️ Sunny';
+  buildMatrix(curJob(), day);
+  document.getElementById('genNotes').value = day.generalNotes || '';
   renderDeliveries(day);
   renderInventory(day);
 }
 
 function queueSave() {
-  // Read current UI state into cache
-  const key = cacheKey(currentJobId, currentDate);
+  const key = ck(currentJobId, currentDate);
   if (!dayCache[key]) return;
-  dayCache[key].generalNotes = document.getElementById('generalNotes').value;
-  dayCache[key].weather = document.getElementById('weatherSelect').value;
+  dayCache[key].generalNotes = document.getElementById('genNotes').value;
+  dayCache[key].weather = document.getElementById('weatherSel').value;
   clearTimeout(saveTimer);
-  setSaveIndicator('saving', 'Unsaved changes...');
-  saveTimer = setTimeout(() => saveDayToSP(currentJobId, currentDate), 1500);
+  setSaveInd('saving', 'Unsaved...');
+  saveTimer = setTimeout(() => saveDay(currentJobId, currentDate), 2000);
 }
 
-// ─── MATRIX ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+// MATRIX
+// ══════════════════════════════════════════════════════════
 function buildMatrix(job, day) {
   if (!job) return;
   const res = job.resources || { labour: [], plant: [], sub: [] };
-  const allCols = [
+  const cols = [
     ...res.labour.map(n => ({ name: n, type: 'labour' })),
-    ...res.plant.map(n => ({ name: n, type: 'plant' })),
-    ...res.sub.map(n => ({ name: n, type: 'sub' }))
+    ...res.plant.map(n  => ({ name: n, type: 'plant' })),
+    ...res.sub.map(n    => ({ name: n, type: 'sub' }))
   ];
-  // Header row 1
-  let h = '<tr><th class="th-activity" style="min-width:190px">Activity</th>';
-  allCols.forEach(c => { h += `<th class="th-${c.type}">${escHtml(c.name)}</th>`; });
-  h += '<th class="th-wbs">WBS</th><th class="th-total">Σ Hrs</th></tr>';
-  // Header row 2 (group labels)
-  h += '<tr><th class="th-activity" style="font-size:10px;font-weight:300;opacity:0.5;text-align:left;padding-left:9px">activity description</th>';
-  const lc = res.labour.length, pc = res.plant.length, sc = res.sub.length;
-  if (lc) h += `<th class="th-labour" colspan="${lc}" style="font-size:9px;opacity:0.7">LABOUR</th>`;
-  if (pc) h += `<th class="th-plant" colspan="${pc}" style="font-size:9px;opacity:0.7">PLANT</th>`;
-  if (sc) h += `<th class="th-sub" colspan="${sc}" style="font-size:9px;opacity:0.7">SUBCON</th>`;
-  h += '<th class="th-wbs" style="font-size:9px;opacity:0.7">CODE</th><th class="th-total" style="font-size:9px;opacity:0.7">TOTAL</th></tr>';
-  document.getElementById('matrixHead').innerHTML = h;
-
+  // Head
+  let h = '<tr><th class="tha" style="min-width:190px">Activity</th>';
+  cols.forEach(c => { h += `<th class="th${c.type[0]}">${esc(c.name)}</th>`; });
+  h += '<th class="thw">WBS</th><th class="tht">Σ Hrs</th></tr>';
+  h += '<tr><th class="tha" style="font-size:9px;opacity:0.4;text-align:left;padding-left:9px">description</th>';
+  if (res.labour.length) h += `<th class="thl" colspan="${res.labour.length}" style="font-size:9px;opacity:0.7">LABOUR</th>`;
+  if (res.plant.length)  h += `<th class="thp" colspan="${res.plant.length}"  style="font-size:9px;opacity:0.7">PLANT</th>`;
+  if (res.sub.length)    h += `<th class="ths" colspan="${res.sub.length}"    style="font-size:9px;opacity:0.7">SUBCON</th>`;
+  h += '<th class="thw" style="font-size:9px;opacity:0.7">CODE</th><th class="tht" style="font-size:9px;opacity:0.7">TOTAL</th></tr>';
+  document.getElementById('mxHead').innerHTML = h;
   // Body
-  if (!day.activities || day.activities.length === 0) day.activities = [{ desc: '', wbs: '' }];
-  document.getElementById('matrixBody').innerHTML = day.activities.map((act, ri) => {
-    let row = `<tr data-row="${ri}"><td class="td-activity"><input type="text" placeholder="Enter activity..." value="${escHtml(act.desc)}" onchange="saveActivity(${ri},'desc',this.value)" /></td>`;
-    allCols.forEach((c, ci) => {
-      const val = day.hours[`${ri}_${ci}`] || '';
-      row += `<td class="td-hours ${c.type}"><input type="number" min="0" step="0.5" placeholder="—" value="${val}" oninput="saveHours(${ri},${ci},this.value)" /></td>`;
+  if (!day.activities?.length) day.activities = [{ desc: '', wbs: '' }];
+  document.getElementById('mxBody').innerHTML = day.activities.map((act, ri) => {
+    let r = `<tr data-row="${ri}"><td class="tda"><input type="text" placeholder="Enter activity..." value="${esc(act.desc)}" onchange="saveAct(${ri},'desc',this.value)" /></td>`;
+    cols.forEach((c, ci) => {
+      const v = day.hours[`${ri}_${ci}`] || '';
+      r += `<td class="tdh ${c.type}"><input type="number" min="0" step="0.5" placeholder="—" value="${v}" oninput="saveHrs(${ri},${ci},this.value)" /></td>`;
     });
-    const total = calcRowTotal(day, ri, allCols.length);
-    row += `<td class="td-wbs"><input type="text" placeholder="WBS" value="${escHtml(act.wbs)}" onchange="saveActivity(${ri},'wbs',this.value)" /></td>`;
-    row += `<td class="td-total row-total">${total > 0 ? total.toFixed(1) : '—'}</td></tr>`;
-    return row;
+    const tot = rowTot(day, ri, cols.length);
+    r += `<td class="tdw"><input type="text" placeholder="WBS" value="${esc(act.wbs)}" onchange="saveAct(${ri},'wbs',this.value)" /></td>`;
+    r += `<td class="tdt row-tot">${tot > 0 ? tot.toFixed(1) : '—'}</td></tr>`;
+    return r;
   }).join('');
-
-  // Footer
-  let f = '<tr class="totals-row"><td>TOTALS</td>';
-  allCols.forEach((c, ci) => {
-    const t = calcColTotal(day, ci, day.activities.length);
-    f += `<td>${t > 0 ? t.toFixed(1) : '—'}</td>`;
-  });
-  const gt = calcGrandTotal(day, allCols.length);
+  // Foot
+  let f = '<tr class="tr-tot"><td>TOTALS</td>';
+  cols.forEach((c, ci) => { const t = colTot(day, ci, day.activities.length); f += `<td>${t > 0 ? t.toFixed(1) : '—'}</td>`; });
+  const gt = grandTot(day, cols.length);
   f += `<td></td><td style="color:var(--accent)">${gt > 0 ? gt.toFixed(1) : '—'}</td></tr>`;
-  document.getElementById('matrixFoot').innerHTML = f;
+  document.getElementById('mxFoot').innerHTML = f;
 }
 
-function calcRowTotal(day, ri, cols) {
-  let t = 0; for (let ci = 0; ci < cols; ci++) t += parseFloat(day.hours[`${ri}_${ci}`] || 0); return t;
-}
-function calcColTotal(day, ci, rows) {
-  let t = 0; for (let ri = 0; ri < rows; ri++) t += parseFloat(day.hours[`${ri}_${ci}`] || 0); return t;
-}
-function calcGrandTotal(day, cols) {
-  let t = 0;
-  const rows = day.activities ? day.activities.length : 0;
-  for (let ri = 0; ri < rows; ri++) for (let ci = 0; ci < cols; ci++) t += parseFloat(day.hours[`${ri}_${ci}`] || 0);
-  return t;
+function rowTot(day, ri, cc) { let t=0; for(let ci=0;ci<cc;ci++) t+=parseFloat(day.hours[`${ri}_${ci}`]||0); return t; }
+function colTot(day, ci, rc) { let t=0; for(let ri=0;ri<rc;ri++) t+=parseFloat(day.hours[`${ri}_${ci}`]||0); return t; }
+function grandTot(day, cc) {
+  let t=0; const rc=day.activities?.length||0;
+  for(let ri=0;ri<rc;ri++) for(let ci=0;ci<cc;ci++) t+=parseFloat(day.hours[`${ri}_${ci}`]||0); return t;
 }
 
-function saveActivity(ri, field, val) {
-  const key = cacheKey(currentJobId, currentDate);
+function saveAct(ri, field, val) {
+  const key = ck(currentJobId, currentDate);
   if (!dayCache[key]) return;
-  if (!dayCache[key].activities[ri]) dayCache[key].activities[ri] = { desc: '', wbs: '' };
+  if (!dayCache[key].activities[ri]) dayCache[key].activities[ri] = { desc:'', wbs:'' };
   dayCache[key].activities[ri][field] = val;
-  refreshTotals();
-  queueSave();
+  refreshTots(); queueSave();
 }
-
-function saveHours(ri, ci, val) {
-  const key = cacheKey(currentJobId, currentDate);
+function saveHrs(ri, ci, val) {
+  const key = ck(currentJobId, currentDate);
   if (!dayCache[key]) return;
-  if (val === '' || val === null) delete dayCache[key].hours[`${ri}_${ci}`];
-  else dayCache[key].hours[`${ri}_${ci}`] = parseFloat(val) || 0;
-  refreshTotals();
-  queueSave();
+  if (val === '') delete dayCache[key].hours[`${ri}_${ci}`];
+  else dayCache[key].hours[`${ri}_${ci}`] = parseFloat(val)||0;
+  refreshTots(); queueSave();
 }
-
-function refreshTotals() {
-  const key = cacheKey(currentJobId, currentDate);
+function refreshTots() {
+  const key = ck(currentJobId, currentDate);
   const day = dayCache[key]; if (!day) return;
-  const job = currentJob(); if (!job) return;
-  const res = job.resources || { labour: [], plant: [], sub: [] };
-  const colCount = res.labour.length + res.plant.length + res.sub.length;
-  const allCols = [...res.labour.map(n=>({n,type:'labour'})), ...res.plant.map(n=>({n,type:'plant'})), ...res.sub.map(n=>({n,type:'sub'}))];
-  day.activities.forEach((_, ri) => {
-    const t = calcRowTotal(day, ri, colCount);
-    const cell = document.querySelector(`tr[data-row="${ri}"] .row-total`);
-    if (cell) cell.textContent = t > 0 ? t.toFixed(1) : '—';
+  const job = curJob(); if (!job) return;
+  const res = job.resources||{labour:[],plant:[],sub:[]};
+  const cc = res.labour.length + res.plant.length + res.sub.length;
+  const cols = [...res.labour.map(n=>({n,t:'l'})),...res.plant.map(n=>({n,t:'p'})),...res.sub.map(n=>({n,t:'s'}))];
+  day.activities.forEach((_,ri) => {
+    const t = rowTot(day,ri,cc);
+    const c = document.querySelector(`tr[data-row="${ri}"] .row-tot`);
+    if (c) c.textContent = t > 0 ? t.toFixed(1) : '—';
   });
-  const cells = document.getElementById('matrixFoot').querySelectorAll('td');
-  allCols.forEach((c, ci) => {
-    const t = calcColTotal(day, ci, day.activities.length);
-    if (cells[ci + 1]) cells[ci + 1].textContent = t > 0 ? t.toFixed(1) : '—';
-  });
-  const gt = calcGrandTotal(day, colCount);
-  const last = cells[cells.length - 1];
-  if (last) last.textContent = gt > 0 ? gt.toFixed(1) : '—';
+  const cells = document.getElementById('mxFoot').querySelectorAll('td');
+  cols.forEach((_,ci) => { const t=colTot(day,ci,day.activities.length); if(cells[ci+1]) cells[ci+1].textContent=t>0?t.toFixed(1):'—'; });
+  const gt = grandTot(day,cc);
+  const last = cells[cells.length-1];
+  if (last) last.textContent = gt>0?gt.toFixed(1):'—';
 }
-
-function addActivityRow() {
-  const key = cacheKey(currentJobId, currentDate);
+function addRow() {
+  const key = ck(currentJobId, currentDate);
   if (!dayCache[key]) return;
-  dayCache[key].activities.push({ desc: '', wbs: '' });
-  const job = currentJob();
-  buildMatrix(job, dayCache[key]);
+  dayCache[key].activities.push({ desc:'', wbs:'' });
+  buildMatrix(curJob(), dayCache[key]);
   queueSave();
 }
 
-// ─── RESOURCES MODAL ─────────────────────────────────────────────────────────
-function openResourceModal() {
-  const job = currentJob(); if (!job) return;
-  const res = job.resources || { labour: [], plant: [], sub: [] };
+// ══════════════════════════════════════════════════════════
+// RESOURCES MODAL
+// ══════════════════════════════════════════════════════════
+function openResModal() {
+  const job = curJob(); if (!job) return;
+  const res = job.resources || { labour:[], plant:[], sub:[] };
   const groups = [
-    { key: 'labour', label: 'Labour / Gangs', cls: 'rg-title-labour' },
-    { key: 'plant',  label: 'Plant',           cls: 'rg-title-plant' },
-    { key: 'sub',    label: 'Subcontractors',  cls: 'rg-title-sub' }
+    { key:'labour', label:'Labour / Gangs', cls:'rgt-l' },
+    { key:'plant',  label:'Plant',           cls:'rgt-p' },
+    { key:'sub',    label:'Subcontractors',  cls:'rgt-s' }
   ];
-  document.getElementById('resourceMgmt').innerHTML = groups.map(g => `
-    <div class="resource-group">
-      <div class="resource-group-title ${g.cls}">${g.label}</div>
+  document.getElementById('resMgmt').innerHTML = groups.map(g => `
+    <div class="rg">
+      <div class="rgt ${g.cls}">${g.label}</div>
       <div id="rg-${g.key}">
-        ${(res[g.key] || []).map((name, i) => `
-          <div class="resource-item">
-            <input type="text" value="${escHtml(name)}" data-group="${g.key}" data-idx="${i}" />
-            <button class="remove-btn" onclick="removeResource('${g.key}',${i})">×</button>
+        ${(res[g.key]||[]).map((name,i) => `
+          <div class="ri">
+            <input type="text" value="${esc(name)}" data-group="${g.key}" data-idx="${i}" />
+            <button class="rmv" onclick="removeRes('${g.key}',${i})">×</button>
           </div>`).join('')}
       </div>
-      <button class="btn btn-outline btn-sm" style="margin-top:7px" onclick="addResource('${g.key}')">+ Add</button>
+      <button class="btn btn-outline btn-sm" style="margin-top:7px" onclick="addRes('${g.key}')">+ Add</button>
     </div>`).join('');
-  document.getElementById('resourceModal').classList.add('open');
+  document.getElementById('resModal').classList.add('open');
 }
-
-function addResource(group) {
-  const job = currentJob(); if (!job) return;
-  if (!job.resources[group]) job.resources[group] = [];
-  job.resources[group].push('');
-  openResourceModal();
-}
-
-function removeResource(group, idx) {
-  const job = currentJob(); if (!job) return;
-  job.resources[group].splice(idx, 1);
-  openResourceModal();
-}
-
-async function applyResources() {
-  const job = currentJob(); if (!job) return;
-  ['labour', 'plant', 'sub'].forEach(g => {
+function addRes(g) { const job=curJob();if(!job)return;job.resources[g].push('');openResModal(); }
+function removeRes(g,i) { const job=curJob();if(!job)return;job.resources[g].splice(i,1);openResModal(); }
+async function applyRes() {
+  const job = curJob(); if (!job) return;
+  ['labour','plant','sub'].forEach(g => {
     const inputs = document.querySelectorAll(`[data-group="${g}"]`);
-    job.resources[g] = Array.from(inputs).map(i => i.value).filter(v => v.trim());
+    job.resources[g] = Array.from(inputs).map(i=>i.value).filter(v=>v.trim());
   });
-  closeModal('resourceModal');
-  setSaveIndicator('saving', 'Saving resources...');
-  await updateJobInSP(job);
-  setSaveIndicator('ok', '● Saved');
-  const key = cacheKey(currentJobId, currentDate);
-  buildMatrix(job, dayCache[key] || { activities: [], hours: {} });
+  closeModal('resModal');
+  setSaveInd('saving','Saving resources...');
+  await saveJobs('Update resources for ' + job.name);
+  setSaveInd('ok','● Saved');
+  const key = ck(currentJobId, currentDate);
+  buildMatrix(job, dayCache[key]||{activities:[],hours:{}});
 }
 
-// ─── DELIVERIES ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+// DELIVERIES
+// ══════════════════════════════════════════════════════════
 function renderDeliveries(day) {
   if (!day.deliveries) day.deliveries = [];
-  document.getElementById('deliveryList').innerHTML = day.deliveries.map((d, i) => `
-    <div class="list-item">
-      <input type="text" class="li-desc" placeholder="Material / item..." value="${escHtml(d.desc)}" onchange="updateDelivery(${i},'desc',this.value)" />
-      <input type="text" class="li-qty"  placeholder="Qty" value="${escHtml(d.qty)}" onchange="updateDelivery(${i},'qty',this.value)" />
-      <input type="text" class="li-unit" placeholder="Unit" value="${escHtml(d.unit)}" onchange="updateDelivery(${i},'unit',this.value)" />
-      <input type="text" class="li-supplier" placeholder="Supplier" value="${escHtml(d.supplier)}" onchange="updateDelivery(${i},'supplier',this.value)" />
-      <button class="remove-btn" onclick="removeDelivery(${i})">×</button>
-    </div>`).join('');
+  document.getElementById('delivList').innerHTML = day.deliveries.map((d,i) => `
+    <div class="li">
+      <input type="text" class="lid" placeholder="Material / item..." value="${esc(d.desc)}" onchange="updDeliv(${i},'desc',this.value)" />
+      <input type="text" class="liq" placeholder="Qty" value="${esc(d.qty)}" onchange="updDeliv(${i},'qty',this.value)" />
+      <input type="text" class="liu" placeholder="Unit" value="${esc(d.unit)}" onchange="updDeliv(${i},'unit',this.value)" />
+      <input type="text" class="lis" placeholder="Supplier" value="${esc(d.supplier)}" onchange="updDeliv(${i},'supplier',this.value)" />
+      <button class="rmv" onclick="rmDeliv(${i})">×</button>
+    </div>`).join('') || '<p style="color:var(--text3);font-size:12px">No deliveries recorded.</p>';
 }
-
 function addDelivery() {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  if (!dayCache[key].deliveries) dayCache[key].deliveries = [];
-  dayCache[key].deliveries.push({ desc: '', qty: '', unit: '', supplier: '' });
+  const key=ck(currentJobId,currentDate); if(!dayCache[key])return;
+  dayCache[key].deliveries.push({desc:'',qty:'',unit:'',supplier:''});
   renderDeliveries(dayCache[key]); queueSave();
 }
-function updateDelivery(i, field, val) {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  dayCache[key].deliveries[i][field] = val; queueSave();
-}
-function removeDelivery(i) {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  dayCache[key].deliveries.splice(i, 1);
-  renderDeliveries(dayCache[key]); queueSave();
-}
+function updDeliv(i,f,v) { const key=ck(currentJobId,currentDate);if(!dayCache[key])return;dayCache[key].deliveries[i][f]=v;queueSave(); }
+function rmDeliv(i) { const key=ck(currentJobId,currentDate);if(!dayCache[key])return;dayCache[key].deliveries.splice(i,1);renderDeliveries(dayCache[key]);queueSave(); }
 
-// ─── INVENTORY ────────────────────────────────────────────────────────────────
-function switchInvTab(tab) {
-  currentInvTab = tab;
-  document.querySelectorAll('.inv-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.inv-panel').forEach(p => p.classList.remove('active'));
-  document.querySelector(`.inv-tab[onclick*="${tab}"]`).classList.add('active');
-  document.getElementById('inv-' + tab).classList.add('active');
+// ══════════════════════════════════════════════════════════
+// INVENTORY
+// ══════════════════════════════════════════════════════════
+function switchInv(tab) {
+  curInvTab = tab;
+  document.querySelectorAll('.itab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ipanel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.itab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById('inv-'+tab).classList.add('active');
 }
-
 function renderInventory(day) {
-  if (!day.inventory) day.inventory = { materials: [], smallplant: [], general: [] };
-  ['materials', 'smallplant', 'general'].forEach(cat => {
-    const items = day.inventory[cat] || [];
-    document.getElementById('inv-' + cat).innerHTML = items.length === 0
+  if (!day.inventory) day.inventory = {materials:[],smallplant:[],general:[]};
+  ['materials','smallplant','general'].forEach(cat => {
+    const items = day.inventory[cat]||[];
+    document.getElementById('inv-'+cat).innerHTML = items.length === 0
       ? '<p style="color:var(--text3);font-size:12px">No items recorded.</p>'
-      : items.map((item, i) => `
-          <div class="list-item">
-            <input type="text" class="li-desc" placeholder="Item..." value="${escHtml(item.desc)}" onchange="updateInvItem('${cat}',${i},'desc',this.value)" />
-            <input type="text" class="li-qty"  placeholder="Qty"  value="${escHtml(item.qty)}"  onchange="updateInvItem('${cat}',${i},'qty',this.value)" />
-            <input type="text" class="li-unit" placeholder="Unit" value="${escHtml(item.unit)}" onchange="updateInvItem('${cat}',${i},'unit',this.value)" />
-            <button class="remove-btn" onclick="removeInvItem('${cat}',${i})">×</button>
+      : items.map((item,i) => `
+          <div class="li">
+            <input type="text" class="lid" placeholder="Item..." value="${esc(item.desc)}" onchange="updInv('${cat}',${i},'desc',this.value)" />
+            <input type="text" class="liq" placeholder="Qty" value="${esc(item.qty)}" onchange="updInv('${cat}',${i},'qty',this.value)" />
+            <input type="text" class="liu" placeholder="Unit" value="${esc(item.unit)}" onchange="updInv('${cat}',${i},'unit',this.value)" />
+            <button class="rmv" onclick="rmInv('${cat}',${i})">×</button>
           </div>`).join('');
   });
 }
-
-function addInventoryItem() {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  if (!dayCache[key].inventory) dayCache[key].inventory = { materials: [], smallplant: [], general: [] };
-  if (!dayCache[key].inventory[currentInvTab]) dayCache[key].inventory[currentInvTab] = [];
-  dayCache[key].inventory[currentInvTab].push({ desc: '', qty: '', unit: '' });
+function addInvItem() {
+  const key=ck(currentJobId,currentDate); if(!dayCache[key])return;
+  if(!dayCache[key].inventory) dayCache[key].inventory={materials:[],smallplant:[],general:[]};
+  if(!dayCache[key].inventory[curInvTab]) dayCache[key].inventory[curInvTab]=[];
+  dayCache[key].inventory[curInvTab].push({desc:'',qty:'',unit:''});
   renderInventory(dayCache[key]); queueSave();
 }
-function updateInvItem(cat, i, field, val) {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  dayCache[key].inventory[cat][i][field] = val; queueSave();
-}
-function removeInvItem(cat, i) {
-  const key = cacheKey(currentJobId, currentDate);
-  if (!dayCache[key]) return;
-  dayCache[key].inventory[cat].splice(i, 1);
-  renderInventory(dayCache[key]); queueSave();
-}
+function updInv(cat,i,f,v) { const key=ck(currentJobId,currentDate);if(!dayCache[key])return;dayCache[key].inventory[cat][i][f]=v;queueSave(); }
+function rmInv(cat,i) { const key=ck(currentJobId,currentDate);if(!dayCache[key])return;dayCache[key].inventory[cat].splice(i,1);renderInventory(dayCache[key]);queueSave(); }
 
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
 async function buildDashboard() {
-  const job = currentJob(); if (!job) return;
-  setSaveIndicator('saving', 'Building dashboard...');
-  // Load all diary entries for this job
-  let allEntries = [];
+  const job = curJob(); if (!job) return;
+  setSaveInd('saving','Building dashboard...');
+  // List all day files for this job
+  let entries = [];
   try {
-    const data = await spGet(`${SP_API()}/getbytitle('SiteDiaryEntries')/items?$select=DiaryDate,Activities,Hours&$filter=JobId eq ${job.id}&$top=500`);
-    allEntries = data.d.results || [];
-  } catch(e) { console.error(e); }
-  setSaveIndicator('ok', '● Saved');
+    const tree = await ghGet(`/repos/${GH_REPO}/contents/data/${job.id}`);
+    if (tree && Array.isArray(tree)) {
+      for (const file of tree) {
+        if (file.name.endsWith('.json')) {
+          const { content } = await ghRead(file.path);
+          if (content) entries.push(content);
+        }
+      }
+    }
+  } catch(e) { console.warn('Dashboard load:', e); }
+  setSaveInd('ok','● Saved');
 
-  let totalLabour = 0, totalPlant = 0, totalSub = 0;
-  const wbsMap = {};
-  const res = job.resources || { labour: [], plant: [], sub: [] };
-  const lc = res.labour.length, pc = res.plant.length, sc = res.sub.length;
+  const res = job.resources||{labour:[],plant:[],sub:[]};
+  const lc=res.labour.length, pc=res.plant.length, sc=res.sub.length;
+  let tl=0,tp=0,ts=0;
+  const wbs = {};
 
-  allEntries.forEach(entry => {
-    const activities = safeParseJson(entry.Activities, []);
-    const hours = safeParseJson(entry.Hours, {});
-    activities.forEach((act, ri) => {
-      for (let ci = 0; ci < lc; ci++) totalLabour += parseFloat(hours[`${ri}_${ci}`] || 0);
-      for (let ci = lc; ci < lc + pc; ci++) totalPlant += parseFloat(hours[`${ri}_${ci}`] || 0);
-      for (let ci = lc + pc; ci < lc + pc + sc; ci++) totalSub += parseFloat(hours[`${ri}_${ci}`] || 0);
-      const wbs = (act.wbs || '').trim().toUpperCase();
-      if (wbs) {
-        if (!wbsMap[wbs]) wbsMap[wbs] = { desc: act.desc || '', labour: 0, plant: 0, sub: 0 };
-        for (let ci = 0; ci < lc; ci++) wbsMap[wbs].labour += parseFloat(hours[`${ri}_${ci}`] || 0);
-        for (let ci = lc; ci < lc + pc; ci++) wbsMap[wbs].plant += parseFloat(hours[`${ri}_${ci}`] || 0);
-        for (let ci = lc + pc; ci < lc + pc + sc; ci++) wbsMap[wbs].sub += parseFloat(hours[`${ri}_${ci}`] || 0);
+  entries.forEach(day => {
+    const acts = day.activities||[], hrs = day.hours||{};
+    acts.forEach((act,ri) => {
+      for(let ci=0;ci<lc;ci++) tl+=parseFloat(hrs[`${ri}_${ci}`]||0);
+      for(let ci=lc;ci<lc+pc;ci++) tp+=parseFloat(hrs[`${ri}_${ci}`]||0);
+      for(let ci=lc+pc;ci<lc+pc+sc;ci++) ts+=parseFloat(hrs[`${ri}_${ci}`]||0);
+      const code=(act.wbs||'').trim().toUpperCase();
+      if(code) {
+        if(!wbs[code]) wbs[code]={desc:act.desc||'',labour:0,plant:0,sub:0};
+        for(let ci=0;ci<lc;ci++) wbs[code].labour+=parseFloat(hrs[`${ri}_${ci}`]||0);
+        for(let ci=lc;ci<lc+pc;ci++) wbs[code].plant+=parseFloat(hrs[`${ri}_${ci}`]||0);
+        for(let ci=lc+pc;ci<lc+pc+sc;ci++) wbs[code].sub+=parseFloat(hrs[`${ri}_${ci}`]||0);
       }
     });
   });
 
-  const grandTotal = totalLabour + totalPlant + totalSub;
-  const estCost = totalLabour * job.lRate + totalPlant * job.pRate + totalSub * job.sRate;
-
+  const gt=tl+tp+ts;
+  const cost=tl*job.lRate+tp*job.pRate+ts*job.sRate;
   document.getElementById('dashCards').innerHTML = `
-    <div class="dash-card"><div class="dash-card-label">Diary Days</div><div class="dash-card-value">${allEntries.length}</div><div class="dash-card-sub">entries recorded</div></div>
-    <div class="dash-card"><div class="dash-card-label">Labour Hours</div><div class="dash-card-value">${totalLabour.toFixed(1)}</div><div class="dash-card-sub">@ £${job.lRate}/hr</div></div>
-    <div class="dash-card"><div class="dash-card-label">Plant Hours</div><div class="dash-card-value">${totalPlant.toFixed(1)}</div><div class="dash-card-sub">@ £${job.pRate}/hr</div></div>
-    <div class="dash-card"><div class="dash-card-label">Est. Total Cost</div><div class="dash-card-value">£${estCost.toLocaleString('en-GB',{maximumFractionDigits:0})}</div><div class="dash-card-sub">${grandTotal.toFixed(1)} total hrs</div></div>`;
+    <div class="dc"><div class="dcl">Diary Days</div><div class="dcv">${entries.length}</div><div class="dcs">entries recorded</div></div>
+    <div class="dc"><div class="dcl">Labour Hours</div><div class="dcv">${tl.toFixed(1)}</div><div class="dcs">@ £${job.lRate}/hr</div></div>
+    <div class="dc"><div class="dcl">Plant Hours</div><div class="dcv">${tp.toFixed(1)}</div><div class="dcs">@ £${job.pRate}/hr</div></div>
+    <div class="dc"><div class="dcl">Est. Total Cost</div><div class="dcv">£${cost.toLocaleString('en-GB',{maximumFractionDigits:0})}</div><div class="dcs">${gt.toFixed(1)} total hrs</div></div>`;
 
-  const wbsEntries = Object.entries(wbsMap);
+  const wbsEntries = Object.entries(wbs);
   document.getElementById('wbsBody').innerHTML = wbsEntries.length === 0
-    ? '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:18px">No WBS codes entered yet. Add WBS codes to activities in the diary.</td></tr>'
-    : wbsEntries.map(([code, d]) => {
-        const total = d.labour + d.plant + d.sub;
-        const cost = d.labour * job.lRate + d.plant * job.pRate + d.sub * job.sRate;
-        return `<tr><td class="mono">${escHtml(code)}</td><td>${escHtml(d.desc||'—')}</td><td class="mono">${d.labour.toFixed(1)}</td><td class="mono">${d.plant.toFixed(1)}</td><td class="mono">${d.sub.toFixed(1)}</td><td class="mono" style="font-weight:600">${total.toFixed(1)}</td><td class="mono" style="color:var(--accent)">£${cost.toLocaleString('en-GB',{maximumFractionDigits:0})}</td></tr>`;
+    ? '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:18px">No WBS codes yet. Add them to activities in the diary.</td></tr>'
+    : wbsEntries.map(([code,d]) => {
+        const tot=d.labour+d.plant+d.sub;
+        const c=d.labour*job.lRate+d.plant*job.pRate+d.sub*job.sRate;
+        return `<tr><td class="mono">${esc(code)}</td><td>${esc(d.desc||'—')}</td><td class="mono">${d.labour.toFixed(1)}</td><td class="mono">${d.plant.toFixed(1)}</td><td class="mono">${d.sub.toFixed(1)}</td><td class="mono" style="font-weight:600">${tot.toFixed(1)}</td><td class="mono" style="color:var(--accent)">£${c.toLocaleString('en-GB',{maximumFractionDigits:0})}</td></tr>`;
       }).join('');
 }
 
-// ─── JOBS ─────────────────────────────────────────────────────────────────────
-function refreshJobSelect() {
-  document.getElementById('jobSelect').innerHTML = jobs.map(j =>
-    `<option value="${j.id}" ${j.id == currentJobId ? 'selected' : ''}>${escHtml(j.name)} (${escHtml(j.number)})</option>`).join('');
+// ══════════════════════════════════════════════════════════
+// JOBS
+// ══════════════════════════════════════════════════════════
+function refreshJobSel() {
+  document.getElementById('jobSelect').innerHTML = jobs
+    .filter(j=>j&&j.id)
+    .map(j=>`<option value="${j.id}" ${j.id===currentJobId?'selected':''}>${esc(j.name)} (${esc(j.number)})</option>`)
+    .join('');
 }
-
 function renderJobsList() {
-  const el = document.getElementById('jobsList');
-  if (jobs.length === 0) { el.innerHTML = '<p style="color:var(--text3)">No jobs yet.</p>'; return; }
-  el.innerHTML = jobs.map(j => `
-    <div class="job-card ${j.id == currentJobId ? 'active-job' : ''}" onclick="switchJob(${j.id})">
+  const el=document.getElementById('jobsList');
+  const list=jobs.filter(j=>j&&j.id);
+  if(!list.length){el.innerHTML='<p style="color:var(--text3)">No jobs yet.</p>';return;}
+  el.innerHTML=list.map(j=>`
+    <div class="jcard ${j.id===currentJobId?'active':''}" onclick="switchJob('${j.id}')">
       <div>
-        <div class="job-card-name">${escHtml(j.name)}</div>
-        <div class="job-card-meta">${escHtml(j.number)} | ${escHtml(j.client)} | £${j.lRate}/hr labour</div>
+        <div class="jname">${esc(j.name)}</div>
+        <div class="jmeta">${esc(j.number)} | ${esc(j.client||'—')} | £${j.lRate}/hr labour</div>
       </div>
-      <div class="job-card-actions" onclick="event.stopPropagation()">
-        ${j.id == currentJobId ? '<span class="tag tag-active">Active</span>' : ''}
-        <button class="btn btn-danger btn-sm" onclick="deleteJob(${j.id})">Delete</button>
+      <div class="jacts" onclick="event.stopPropagation()">
+        ${j.id===currentJobId?'<span class="tag">Active</span>':''}
+        <button class="btn btn-danger btn-sm" onclick="deleteJob('${j.id}')">Delete</button>
       </div>
     </div>`).join('');
 }
-
 async function switchJob(id) {
-  currentJobId = id;
-  dayCache = {};
-  refreshJobSelect();
-  renderJobsList();
-  await loadAndRenderDay();
+  currentJobId=id; dayCache={};
+  refreshJobSel(); renderJobsList();
+  await loadAndRender();
 }
-
-function openNewJobModal() {
-  ['newJobName','newJobNumber','newJobClient'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('newJobLRate').value = 45;
-  document.getElementById('newJobPRate').value = 85;
-  document.getElementById('newJobSRate').value = 55;
+function openNewJob() {
+  ['njName','njNum','njClient'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('njLRate').value=45;
+  document.getElementById('njPRate').value=85;
+  document.getElementById('njSRate').value=55;
   document.getElementById('newJobModal').classList.add('open');
 }
-
 async function saveNewJob() {
-  const name = document.getElementById('newJobName').value.trim();
-  if (!name) { alert('Please enter a job name.'); return; }
-  setSaveIndicator('saving', 'Creating job...');
-  closeModal('newJobModal');
-  const resources = { labour: ['Gang A'], plant: [], sub: [] };
-  const result = await createJobInSP(
+  const name=document.getElementById('njName').value.trim();
+  if(!name){alert('Please enter a job name.');return;}
+  const job={
+    id:'job_'+Date.now(),
     name,
-    document.getElementById('newJobNumber').value,
-    document.getElementById('newJobClient').value,
-    parseFloat(document.getElementById('newJobLRate').value) || 45,
-    parseFloat(document.getElementById('newJobPRate').value) || 85,
-    parseFloat(document.getElementById('newJobSRate').value) || 55,
-    resources
-  );
-  const newJob = {
-    id: result.d.Id,
-    name, number: document.getElementById('newJobNumber').value,
-    client: document.getElementById('newJobClient').value,
-    lRate: parseFloat(document.getElementById('newJobLRate').value) || 45,
-    pRate: parseFloat(document.getElementById('newJobPRate').value) || 85,
-    sRate: parseFloat(document.getElementById('newJobSRate').value) || 55,
-    resources
+    number:document.getElementById('njNum').value,
+    client:document.getElementById('njClient').value,
+    lRate:parseFloat(document.getElementById('njLRate').value)||45,
+    pRate:parseFloat(document.getElementById('njPRate').value)||85,
+    sRate:parseFloat(document.getElementById('njSRate').value)||55,
+    resources:{labour:['Gang A'],plant:[],sub:[]}
   };
-  jobs.push(newJob);
-  currentJobId = newJob.id;
-  dayCache = {};
-  setSaveIndicator('ok', '● Saved');
-  refreshJobSelect();
-  renderJobsList();
-  openTab('diary');
-  await loadAndRenderDay();
+  jobs.push(job);
+  closeModal('newJobModal');
+  setSaveInd('saving','Creating job...');
+  await saveJobs('Add job: '+name);
+  setSaveInd('ok','● Saved');
+  currentJobId=job.id; dayCache={};
+  refreshJobSel(); renderJobsList();
+  goTab('diary');
+  await loadAndRender();
 }
-
 async function deleteJob(id) {
-  if (!confirm('Delete this job and all diary entries? This cannot be undone.')) return;
-  try {
-    await spDelete(`${SP_API()}/getbytitle('SiteDiaryJobs')/items(${id})`);
-    jobs = jobs.filter(j => j.id !== id);
-    if (currentJobId == id) currentJobId = jobs[0]?.id || null;
-    dayCache = {};
-    refreshJobSelect();
-    renderJobsList();
-    if (currentJobId) await loadAndRenderDay();
-  } catch(e) { alert('Delete failed: ' + e.message); }
+  if(!confirm('Delete this job? Diary entries in GitHub will remain but the job will no longer appear.'))return;
+  jobs=jobs.filter(j=>j.id!==id);
+  if(currentJobId===id) currentJobId=jobs[0]?.id||null;
+  dayCache={};
+  await saveJobs('Delete job '+id);
+  refreshJobSel(); renderJobsList();
+  if(currentJobId) await loadAndRender();
 }
 
-// ─── TABS ─────────────────────────────────────────────────────────────────────
-function openTab(name) {
-  const tabs = ['diary','dashboard','jobs'];
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'dashboard') buildDashboard();
+// ══════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════
+function goTab(name) {
+  const names=['diary','dashboard','jobs'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard') buildDashboard();
 }
 
-// ─── EXPORT ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════════════════════════
 function exportDay() {
-  const job = currentJob(); if (!job) return;
-  const key = cacheKey(currentJobId, currentDate);
-  const day = dayCache[key]; if (!day) return;
-  const res = job.resources || { labour: [], plant: [], sub: [] };
-  const allCols = [...res.labour.map(n=>({name:n,type:'labour'})),...res.plant.map(n=>({name:n,type:'plant'})),...res.sub.map(n=>({name:n,type:'sub'}))];
-  let csv = `Site Diary Export\nJob: ${job.name} (${job.number})\nDate: ${formatDate(currentDate)}\nWeather: ${day.weather}\n\n`;
-  csv += `Activity,${allCols.map(c=>c.name).join(',')},WBS Code,Total Hours\n`;
-  (day.activities||[]).forEach((act,ri) => {
-    const hrs = allCols.map((_,ci) => day.hours[`${ri}_${ci}`]||0);
-    const total = hrs.reduce((a,b)=>a+parseFloat(b),0);
-    csv += `"${act.desc}",${hrs.join(',')},"${act.wbs}",${total.toFixed(1)}\n`;
+  const job=curJob(); if(!job)return;
+  const key=ck(currentJobId,currentDate);
+  const day=dayCache[key]; if(!day)return;
+  const res=job.resources||{labour:[],plant:[],sub:[]};
+  const cols=[...res.labour.map(n=>({name:n,type:'labour'})),...res.plant.map(n=>({name:n,type:'plant'})),...res.sub.map(n=>({name:n,type:'sub'}))];
+  let csv=`Site Diary Export\nJob: ${job.name} (${job.number})\nDate: ${fmtDate(currentDate)}\nWeather: ${day.weather}\n\n`;
+  csv+=`Activity,${cols.map(c=>c.name).join(',')},WBS Code,Total Hours\n`;
+  (day.activities||[]).forEach((act,ri)=>{
+    const hrs=cols.map((_,ci)=>day.hours[`${ri}_${ci}`]||0);
+    const tot=hrs.reduce((a,b)=>a+parseFloat(b),0);
+    csv+=`"${act.desc}",${hrs.join(',')},"${act.wbs}",${tot.toFixed(1)}\n`;
   });
-  csv += `\nGeneral Notes:\n"${day.generalNotes}"\n\nDeliveries:\nDescription,Qty,Unit,Supplier\n`;
-  (day.deliveries||[]).forEach(d => { csv += `"${d.desc}","${d.qty}","${d.unit}","${d.supplier}"\n`; });
-  const blob = new Blob([csv],{type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `SiteDiary_${job.number}_${currentDate}.csv`;
+  csv+=`\nGeneral Notes:\n"${day.generalNotes}"\n\nDeliveries:\nDescription,Qty,Unit,Supplier\n`;
+  (day.deliveries||[]).forEach(d=>{csv+=`"${d.desc}","${d.qty}","${d.unit}","${d.supplier}"\n`;});
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`SiteDiary_${job.number}_${currentDate}.csv`;
   a.click();
 }
 
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function safeParseJson(str, fallback) { try { return JSON.parse(str||'null') || fallback; } catch(e) { return fallback; } }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// ══════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
-// ─── BOOT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('load', handleRedirect);
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+window.addEventListener('load', autoLogin);
 </script>
 </body>
 </html>
